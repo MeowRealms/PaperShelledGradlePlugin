@@ -7,5 +7,4 @@ pluginManagement {
 
 rootProject.name = "papershelled"
 
-include(":example")
 includeBuild("plugin-build")

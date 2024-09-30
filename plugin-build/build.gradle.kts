@@ -1,6 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
+    `maven-publish`
     kotlin("jvm") version BuildPluginsVersion.KOTLIN apply false
     id("com.gradle.plugin-publish") version BuildPluginsVersion.PLUGIN_PUBLISH apply false
     id("com.github.ben-manes.versions") version BuildPluginsVersion.VERSIONS_PLUGIN

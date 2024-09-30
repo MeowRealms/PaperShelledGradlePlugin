@@ -31,22 +31,7 @@ abstract class Plugin : Plugin<Project> {
             if (!Files.exists(it.jarFile.get().asFile.toPath())) it.dependsOn(download)
         }
 
-        val reobf = project.tasks.register("reobf", ReobfTask::class.java) {
-            it.relocateCraftBukkit.set(extension.relocateCraftBukkit)
-            it.reobfFile.set(extension.reobfFile)
-            it.craftBukkitVersion.set(extension.craftBukkitVersion)
-            it.paperShelledJar.set(extension.paperShelledJar)
-            it.archiveClassifier.set(extension.archiveClassifier)
-            if (!Files.exists(it.reobfFile.get().asFile.toPath()) ||
-                !Files.exists(it.paperShelledJar.get().asFile.toPath())
-            ) it.dependsOn(gmj)
-        }
-
         project.afterEvaluate {
-            if (extension.reobfAfterJarTask.get()) project.tasks.withType(Jar::class.java) {
-                lastJarTask = it
-                it.finalizedBy(reobf)
-            }
             val dep = project.dependencies
 
             val refMapName = extension.referenceMapName.get()
@@ -60,7 +45,7 @@ abstract class Plugin : Plugin<Project> {
                 arrayOf(
                     "net.fabricmc:fabric-mixin-compile-extensions:0.4.6",
                     "org.apache.logging.log4j:log4j-core:2.14.1",
-                    "org.ow2.asm:asm-commons:9.2"
+                    "org.ow2.asm:asm-commons:9.7"
                 ).forEach { name -> dep.add("annotationProcessor", dep.create(name)) }
                 project.tasks.withType(Jar::class.java) {
                     it.from(project.file(refMap.toFile())) { c -> c.rename { refMapName } }
@@ -71,28 +56,14 @@ abstract class Plugin : Plugin<Project> {
                 it.options.compilerArgs.add("-ArefMapFileName=$refMapName")
                 if (extension.generateReferenceMap.get()) {
                     it.options.compilerArgs.apply {
-                        add("-AdefaultObfuscationEnv=named:intermediary")
+                        add("-AdefaultObfuscationEnv=named:named")
                         add("-AinMapFileNamedIntermediary=" + extension.reobfFile.get().asFile.path)
                         add("-AoutRefMapFile=$refMap")
                     }
                 }
             }
 
-            val v = extension.paperShelledVersion.get()
-            val av = extension.annotationsVersion.get()
             val mv = extension.mixinVersion.get()
-            if (av.isNotEmpty() && v.isNotEmpty()) {
-                project.repositories.maven {
-                    it.url = URI.create("https://www.jitpack.io/")
-                    it.content { res -> res.includeGroup("com.github.Apisium") }
-                }
-                if (av.isNotEmpty()) {
-                    val d = dep.create("com.github.Apisium:PaperShelledAnnotations:$av")
-                    dep.add("annotationProcessor", d)
-                    dep.add("compileOnly", d)
-                }
-                if (v.isNotEmpty()) dep.add("compileOnly", dep.create("com.github.Apisium:PaperShelled:$v"))
-            }
             if (mv.isNotEmpty()) {
                 project.repositories.maven {
                     it.url = URI.create("https://repo.spongepowered.org/repository/maven-public/")

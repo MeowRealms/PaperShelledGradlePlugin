@@ -1,4 +1,5 @@
 plugins {
+    `maven-publish`
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish")
@@ -6,12 +7,13 @@ plugins {
 
 dependencies {
     implementation(gradleApi())
+//    implementation(localGroovy())
     implementation(kotlin("stdlib-jdk8"))
-    implementation("net.fabricmc:tiny-remapper:0.8.1")
+    implementation("net.fabricmc:tiny-remapper:0.10.4")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
-    implementation("me.lucko:jar-relocator:1.5") {
-        exclude("org.ow2.asm")
-    }
+//    implementation("me.lucko:jar-relocator:1.5") {
+//        exclude("org.ow2.asm")
+//    }
 
     repositories {
         mavenCentral()
